@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Search, SlidersHorizontal, Plus, ListTodo } from 'lucide-react'
+import { Search, SlidersHorizontal,Flag, Plus, ListTodo } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
 import SectionHeading from '../components/SectionHeading'
 import StatusBadge from '../components/StatusBadge'
 import PriorityBadge from '../components/PriorityBadge'
 
+const ALL_STATUS = 'All status'
+const ALL_PRIORITIES = 'All priorities'
+const PRIORITIES = ['High', 'Medium', 'Low']
 export default function Tasks() {
   const [tasks, setTasks] = useState([])
   const [projects, setProjects] = useState([])
@@ -38,7 +41,14 @@ export default function Tasks() {
         <div className="task-toolbar">
           <div className="search-wrap"><Search size={17} /><input aria-label="Search tasks" placeholder="Search tasks or people..." value={search} onChange={(e) => setSearch(e.target.value)} /></div>
           <div className="filter-wrap"><SlidersHorizontal size={16} /><select aria-label="Filter by status" value={status} onChange={(e) => setStatus(e.target.value)}><option>All status</option><option>To do</option><option>In progress</option><option>Review</option><option>Done</option></select></div>
-          {/* The priority filter is intentionally not part of the starter requirements. */}
+          <div className="filter-wrap">
+  <Flag size={16} aria-hidden="true" />
+  <label htmlFor="priority-filter" className="sr-only">Filter by priority</label>
+  <select id="priority-filter" value={priority} onChange={(e) => setPriority(e.target.value)}>
+    <option value={ALL_PRIORITIES}>All priorities</option>
+    {PRIORITIES.map((level) => <option key={level} value={level}>{level}</option>)}
+  </select>
+</div>
         </div>
         {error && <div className="form-error">{error}</div>}
         {loading ? <div className="loading-state">Loading tasks…</div> : <div className="table-wrap"><table className="tasks-table"><thead><tr><th>Task name</th><th>Assignee</th><th>Due date</th><th>Priority</th><th>Status</th><th><span className="sr-only">Open</span></th></tr></thead><tbody>
@@ -48,6 +58,7 @@ export default function Tasks() {
         </div>}
         <div className="table-footer"><span>Showing {filteredTasks.length} of {tasks.length} tasks</span><span>Updated just now</span></div>
       </div>
+      
     </div>
   )
 }
