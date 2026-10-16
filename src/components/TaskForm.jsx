@@ -1,20 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowLeft, Save } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-const blankTask = { title: '', description: '', status: 'To do', priority: 'Medium', dueDate: '', projectId: '1', assignee: '' }
-
+const blankTask = { title: '', description: '', status: 'To do', priority: 'Medium', dueDate: '', projectId: '', assignee: '' }
 export default function TaskForm({ initialValues, projects, onSubmit, submitLabel = 'Create task' }) {
   const [form, setForm] = useState({ ...blankTask, ...initialValues })
   const [error, setError] = useState('')
-
+  useEffect(() => {
+    if (!form.projectId && projects.length > 0) {
+      setForm((current) => ({ ...current, projectId: String(projects[0].id) }))
+    }
+  }, [projects, form.projectId])
   function update(event) {
     setForm((current) => ({ ...current, [event.target.name]: event.target.value }))
   }
 
   async function handleSubmit(event) {
     event.preventDefault()
-    if (form.title.length === 0) {
+    if (form.title.trim().length === 0) {
       setError('A task title is required.')
       return
     }
@@ -23,7 +26,7 @@ export default function TaskForm({ initialValues, projects, onSubmit, submitLabe
       return
     }
     setError('')
-    await onSubmit(form)
+    await onSubmit({ ...form, title: form.title.trim() })
   }
 
   return (
